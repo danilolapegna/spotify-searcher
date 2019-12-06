@@ -1,0 +1,69 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+
+android {
+    compileSdkVersion Dependencies.compileSdkVersion
+    defaultConfig {
+        minSdkVersion Dependencies.minSdkVersion
+        targetSdkVersion Dependencies.targetSdkVersion
+        versionCode Dependencies.versionCode
+        versionName Dependencies.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath false
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+dependencies {
+
+    // Network
+    api Square.retrofit
+    api Square.moshi_retrofit
+    api Square.rxadapter
+    api Square.moshi
+    api Square.moshi_kotlin
+    api Square.okhttp
+    api Square.okhttp_intercepter
+
+    api Converter.gson
+
+    // RxJava
+    api Reactive.rxJava2
+    api Reactive.rxAndroid
+    
+    // Dagger
+    implementation Di.dagger
+    implementation Di.dagger_android
+    implementation Di.dagger_android_support
+    kapt Di.dagger_compiler
+    kapt Di.dagger_android_processor
+
+    //Test
+    testApi TestLibs.junit
+    androidTestApi TestLibs.runner
+    testApi TestLibs.mockito
+    testApi TestLibs.mockito_kotlin
+    androidTestApi TestLibs.espresso
+}
+

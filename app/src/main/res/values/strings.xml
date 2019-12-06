@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Spotify App</string>
+    <string name="com_spotify_sdk_redirect_scheme">ticketswap-spotify</string>
+    <string name="com_spotify_sdk_redirect_host">ticketswap-spotify</string>
+    <string name="spotify_campaign_token">your-campaign-token</string>
+    <string name="spotify_scope">user-read-email</string>
+    <string name="spotify_client_id">84ea753e599142b8bace9b63d153227b</string>
+    <string name="spotify_base_url">https://api.spotify.com/v1/</string>
+    <string name="search_button">Search</string>
+    <string name="no_results_no_query">\n Click on the top bar and start searching on Spotify!</string>
+    <string name="no_results">\n No results</string>
+    <string name="content_image">Content image</string>
+    <string name="spotify_path_search">search</string>
+    <string name="spotify_query_param_name">q</string>
+    <string name="spotify_type_param_name">type</string>
+    <string name="spotify_type_param_value">track,artist</string>
+    <string name="search_error">Error while trying to grab search results</string>
+    <string name="auth_error">Expired token. Please log in again</string>
+    <string name="track_artist_hint">Search artist or track!</string>
+    <string name="login">Login with Spotify</string>
+    <string name="album_format">Album:&#160;</string>
+    <string name="track_number_format">Track number:&#160;</string>
+    <string name="by_artist_format">By:&#160;</string>
+    <string name="full_name_format">Full name:&#160;</string>
+    <string name="genre_format">Genre:&#160;</string>
+    <string name="list_comma_format">,&#160;</string>
+    <string name="genres_unknown">Unknown</string>
+    <string name="go_to_artist_page">Go to artist page</string>
+    <string name="unavailable_network_error">Unavailable network</string>
+    <string name="logout">Logout</string>
+    <string name="successful_logout">Logged out successfully</string>
+    <string name="path_param_track">tracks</string>
+    <string name="path_param_artist">artists</string>
+    <string name="play_spotify_page">Play on Spotify</string>
+</resources>

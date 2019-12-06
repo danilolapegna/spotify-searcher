@@ -1,0 +1,62 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'realm-android'
+
+
+android {
+    compileSdkVersion Dependencies.compileSdkVersion
+    defaultConfig {
+        applicationId Dependencies.applicationId
+        minSdkVersion Dependencies.minSdkVersion
+        targetSdkVersion Dependencies.targetSdkVersion
+        versionCode Dependencies.versionCode
+        versionName Dependencies.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath false
+            }
+        }
+
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(":library_rest")
+    implementation Libs.appcompat
+    implementation Libs.support
+    implementation Libs.constraint_layout
+    implementation Libs.design
+    implementation Libs.materialSearch
+
+    // Log
+    implementation Square.timber
+
+    // Image loading
+    implementation Square.picasso
+
+    // Dagger
+    implementation Di.dagger
+    implementation Di.dagger_android
+    implementation Di.dagger_android_support
+    kapt Di.dagger_compiler
+    kapt Di.dagger_android_processor
+
+    // Spotify
+    implementation Spotify.spotify
+
+}
