@@ -31,5 +31,17 @@ RxApiClientRequestBuilder<T>()
                 .build()
 ```
 
+Which then you can subscribe to by simply using the regular `Single<SearchResponse>.subscribe` method. 
+
+## Persistent storage
+
+All the necessary data, and no more data than that, is persisted in cache via [Realm](https://realm.io/) 
+
+This also allows the app to be fully reactive, as UI can be subscribed to realm changes.
+
+Also, in case of no network, in case an object is already available on Realm, it will be pre-emptively loaded.
+
+There's also a quick check such that if the object is older than a day, or has some incomplete fields, the app will try reloading it.
+
 
 
