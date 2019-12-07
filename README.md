@@ -43,5 +43,10 @@ Also, in case of no network, in case an object is already available on Realm, it
 
 There's also a quick check such that if the object is older than a day, or has some incomplete fields, the app will try reloading it.
 
+## Functionality
 
+## Could-be-added/To-be-improved
 
+- For now the Rx client/library only supports json bodies as a MediaType, so different kind of media (simply by adding more values and converters to the enum), like images or video, can be added in future.
+- Some pagination, maybe with lazy loading, could be added to the main search in order to add a few more results per string. By the way, as far as I could see, for now, a reasonable set of relevant results is always displayed.
+- Authentication is made without a refresh token, which means it expires usually after 30 minutes of use. We need probably to implement a longer one. By the way, for now, expiration is handled and the user is prompted to log in again.
