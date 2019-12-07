@@ -64,8 +64,6 @@ No `LiveData` was used, as Rx and Realm both already fulfilled the purpose of ge
 
 - Login screen: a very plain and simple screen made in a `LoginActivity`, allowing authentication via the Spotify SDK
 
-![Search screen](https://i.ibb.co/c2YzL5g/Screenshot-1575732148.png =400x)
-
 - Search screen: made in a `SearchActivity` + `SearchFragment`, it is where most of the magic happens. An api call is made automatically for the last search term typed. Artists and tracks for that term are returned, each of them is recognisable thanks to an icon (implemented via `VectorDrawable`), and each of them is persisted onto realm only on click, to avoid engulfing the app persistent storage with MBs that will never be used. Some progress is shown and a "no results" text is displayed in case the search returns no results. Also, a toast is displayed in case of error. 
 
 - Artist screen: made in a `ArtistActivity` + `ArtistFragment`, is a detail page with the artist info. Made with a `CollapsingToolbarLayout`, it loads the artist from Realm first, and if the data is complete and up-to-date, doesn't perform any further api call. Also, gives the possibility to reach the Spotify page for the artist.
