@@ -43,10 +43,42 @@ Also, in case of no network, in case an object is already available on Realm, it
 
 There's also a quick check such that if the object is older than a day, or has some incomplete fields, the app will try reloading it.
 
+## Architecture
+
+The one used here is a "pure" MVVM, where each factory was separately created, by extending the default one, in order to allow passing a parameter.
+
+No `LiveData` was used, as Rx and Realm both already fulfilled the purpose of generating fully observable sets of mutable data.
+
 ## Functionality
+
+- Login screen: a very plain and simple screen made in a `LoginActivity`, allowing authentication via the Spotify SDK
+
+- Search screen: made in a `SearchActivity` + `SearchFragment`, it is where most of the magic happens. An api call is made automatically for the last search term typed. Artists and tracks for that term are returned, each of them is recognisable thanks to an icon (implemented via `VectorDrawable`), and each of them is persisted onto realm only on click, to avoid engulfing the app persistent storage with MBs that will never be used. Some progress is shown and a "no results" text is displayed in case the search returns no results. Also, a toast is displayed in case of error. 
+
+- Artist screen: made in a `ArtistActivity` + `ArtistFragment`, is a detail page with the artist info. Made with a `CollapsingToolbarLayout`, it loads the artist from Realm first, and if the data is complete and up-to-date, doesn't perform any further api call. Also, gives the possibility to reach the Spotify page for the artist.
+
+- Track screen: made in a `TrackActivity` + `TrackFragment`, a detail page with the track info. Also made with a `CollapsingToolbarLayout`, it loads the track from Realm first, and if the data is complete and up-to-date, doesn't perform any further api call. Displays the artist list for that track and allows to reach the in-app page on click. Also, displays the track duration and gives the possibility to reach the Spotify page for the track, by both a clickable `Spannable` and a (by simplicity) play button.
+
+## Other to-be-noted
+
+- A kotlin extension `UIExtensions.kt` was implemented as a convenience to allow quicker operations on activities/fragments
+
+- Picasso was used as a default image loading library.
+
+- [Material search bar](https://github.com/mancj/MaterialSearchBar) was used for the main search screen.
+
+- Proximanova font was added for a more pleasant user experience
+
+- Last api call, wrapped in a closure, is kept on hold in case requested during a moment of no network. The whole app is constantly aware of the current network state through the implementation of a Rx-based `ConnectionStateMonitor` component, and hence the app will be re-executed once the connection is back.
 
 ## Could-be-added/To-be-improved
 
-- For now the Rx client/library only supports json bodies as a MediaType, so different kind of media (simply by adding more values and converters to the enum), like images or video, can be added in future.
+This is the list of the "limitations" I'm aware of and that were kept as such as a matter of simplicity and to have this done within a reasonable amount of time. By the way there's also no reason to believe these feats won't be added in future. 
+
+- For now my Rx client/library only supports json bodies as a MediaType, so different kind of media (simply by adding more values and converters to the enum), like images or video, can be added in future.
+
 - Some pagination, maybe with lazy loading, could be added to the main search in order to add a few more results per string. By the way, as far as I could see, for now, a reasonable set of relevant results is always displayed.
-- Authentication is made without a refresh token, which means it expires usually after 30 minutes of use. We need probably to implement a longer one. By the way, for now, expiration is handled and the user is prompted to log in again.
+
+- Authentication is made without a refresh token, which means it expires usually after 30 minutes of use. We need probably to implement a full authentication flow with longer-living token mechanism. By the way by simplicity, and given the sample purpose of the app, this is left as a to-do thing, expiration is handled anyway, and the user is each time prompted to log in again.
+
+- Api call kept on hold when there's no network: probably a larger queue could be implemented + a mechanism to make sure the app isn't re-executed in case it isn't "useful" anymore for the current screen.
