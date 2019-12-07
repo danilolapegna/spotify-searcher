@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">Spotify Searcher</string>
-    <string name="com_spotify_sdk_redirect_scheme">ticketswap-spotify</string>
-    <string name="com_spotify_sdk_redirect_host">ticketswap-spotify</string>
+    <string name="com_spotify_sdk_redirect_scheme">spotify-searcher</string>
+    <string name="com_spotify_sdk_redirect_host">spotify-searcher</string>
     <string name="spotify_campaign_token">your-campaign-token</string>
     <string name="spotify_scope">user-read-email</string>
-    <string name="spotify_client_id">84ea753e599142b8bace9b63d153227b</string>
+    <string name="spotify_client_id">1cd528ddbf3e400ea60574ba7b8f6ab8</string>
     <string name="spotify_base_url">https://api.spotify.com/v1/</string>
     <string name="search_button">Search</string>
     <string name="no_results_no_query">\n Click on the top bar and start searching on Spotify!</string>
