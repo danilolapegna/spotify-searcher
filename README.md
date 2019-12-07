@@ -65,7 +65,7 @@ No `LiveData` was used, as Rx and Realm both already fulfilled the purpose of ge
 
 - A kotlin extension `UIExtensions.kt` was implemented as a convenience to allow quicker operations on activities/fragments
 
-- Picasso was used as a default image loading library.
+- Picasso was used as a default image loading library. A placeholder is displayed while loading and kept in case of error.
 
 - [Material search bar](https://github.com/mancj/MaterialSearchBar) was used for the main search screen.
 
@@ -75,7 +75,7 @@ No `LiveData` was used, as Rx and Realm both already fulfilled the purpose of ge
 
 ## Could-be-added/To-be-improved
 
-This is the list of the "limitations" I'm aware of and that were kept as such as a matter of simplicity and to have this done within a reasonable amount of time. By the way there's also no reason to believe these feats won't be added in future. 
+This is the list of the "limitations" I'm aware, of and that were kept as such as a matter of simplicity, and in order to get this done within a reasonable amount of time. By the way there's also no reason to believe these feats won't be added in future. 
 
 - For now my Rx client/library only supports json bodies as a MediaType, so different kind of media (simply by adding more values and converters to the enum), like images or video, can be added in future to the `BodyType` `enum class`.
 
