@@ -33,6 +33,8 @@ RxApiClientRequestBuilder<T>()
 
 Which then you can subscribe to by simply using the regular `Single<SearchResponse>.subscribe` method. 
 
+Any Http method (GET/POST/PUT/PATCH/DELETE) is fully supported. But where not explicitly defined in the request, the app assumes and defaults to GET.
+
 ## Persistent storage
 
 All the necessary data, and no more data than that, is persisted in cache via [Realm](https://realm.io/) 
