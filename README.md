@@ -55,15 +55,15 @@ No `LiveData` was used, as Rx and Realm both already fulfilled the purpose of ge
 
 - Login screen: a very plain and simple screen made in a `LoginActivity`, allowing authentication via the Spotify SDK
 
-![Search screen](https://i.ibb.co/c2YzL5g/Screenshot-1575732148.png)
+![Search screen](https://i.ibb.co/c2YzL5g/Screenshot-1575732148.png =400x)
 
 - Search screen: made in a `SearchActivity` + `SearchFragment`, it is where most of the magic happens. An api call is made automatically for the last search term typed. Artists and tracks for that term are returned, each of them is recognisable thanks to an icon (implemented via `VectorDrawable`), and each of them is persisted onto realm only on click, to avoid engulfing the app persistent storage with MBs that will never be used. Some progress is shown and a "no results" text is displayed in case the search returns no results. Also, a toast is displayed in case of error. 
 
-![Artist screen](https://i.ibb.co/vmz4FRq/Screenshot-1575732152.png)
+![Artist screen](https://i.ibb.co/vmz4FRq/Screenshot-1575732152.png =400x)
 
 - Artist screen: made in a `ArtistActivity` + `ArtistFragment`, is a detail page with the artist info. Made with a `CollapsingToolbarLayout`, it loads the artist from Realm first, and if the data is complete and up-to-date, doesn't perform any further api call. Also, gives the possibility to reach the Spotify page for the artist.
 
-![Track screen](https://i.ibb.co/D9nVkmn/Screenshot-1575732161.png)
+![Track screen](https://i.ibb.co/D9nVkmn/Screenshot-1575732161.png =400x)
 
 - Track screen: made in a `TrackActivity` + `TrackFragment`, a detail page with the track info. Also made with a `CollapsingToolbarLayout`, it loads the track from Realm first, and if the data is complete and up-to-date, doesn't perform any further api call. Displays the artist list for that track and allows to reach the in-app page on click. Also, displays the track duration and gives the possibility to reach the Spotify page for the track, by both a clickable `Spannable` and a (by simplicity) play button.
 
