@@ -77,7 +77,7 @@ No `LiveData` was used, as Rx and Realm both already fulfilled the purpose of ge
 
 This is the list of the "limitations" I'm aware of and that were kept as such as a matter of simplicity and to have this done within a reasonable amount of time. By the way there's also no reason to believe these feats won't be added in future. 
 
-- For now my Rx client/library only supports json bodies as a MediaType, so different kind of media (simply by adding more values and converters to the enum), like images or video, can be added in future.
+- For now my Rx client/library only supports json bodies as a MediaType, so different kind of media (simply by adding more values and converters to the enum), like images or video, can be added in future to the `BodyType` `enum class`.
 
 - Some pagination, maybe with lazy loading, could be added to the main search in order to add a few more results per string. By the way, as far as I could see, for now, a reasonable set of relevant results is always displayed.
 
