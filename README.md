@@ -35,6 +35,15 @@ Which then you can subscribe to by simply using the regular `Single<SearchRespon
 
 Any Http method (GET/POST/PUT/PATCH/DELETE) is fully supported. But where not explicitly defined in the request, the app assumes and defaults to GET.
 
+### Unit tests
+
+Library is unit-tested with Dagger + Mockito. Two components, in particular, are tested for now: 
+
+- `OkHttpRequestExecutor`, the base component we use to execute requests. In this test a test Dagger module injects a mock `OkHttpClient` and a mock `OkHttpRequestProvider` and verifies the executor still does its job.
+
+- `RxApiClient`, the single Rx generator as from above. In this test a test Dagger module injects a mock `BaseRestRequestExecutor` and verifies the client still returns a valid `Single<Response>`.
+
+
 ## Persistent storage
 
 All the necessary data, and no more data than that, is persisted in cache via [Realm](https://realm.io/) 
@@ -77,11 +86,11 @@ No `LiveData` was used, as Rx and Realm both already fulfilled the purpose of ge
 
 ## Could-be-added/To-be-improved
 
-This is the list of the "limitations" I'm aware, of and that were kept as such as a matter of simplicity, and in order to get this done within a reasonable amount of time. By the way there's also no reason to believe these feats won't be added in future. 
+This is the list of the "limitations" I'm aware of, and that were kept as such as a matter of simplicity, and in order to get this done within a reasonable amount of time. By the way there's also no reason to believe these feats won't be added in future. 
 
 - Authentication is made without a refresh token, which means it expires usually after 30 minutes of use. We'd need probably to implement a full authentication flow with longer-living token mechanism. By the way doing this without a backend would imply hardcoding a `client_secret` into the mobile app, and that's absolutely unsafe and not recommended. For this reason we'll get to this 30 minutes of usage compromise. Expiration is gracefully handled anyway, and the user is each time prompted to log in again.
 
-- For now my Rx client/library only supports `json` bodies as a MediaType, so different kind of media (simply by adding more values and converters to the enum), like images or video, can be added in future to the `BodyType` `enum class`.
+- For now my Rx client/library only supports `json` body as a MediaType, so different kind of media (simply by adding more values and converters to the enum), like images or video, can be added in future to the `BodyType` `enum class`.
 
 - Artist page feels a bit empty. Some more, interesting info could be added? Maybe an albums query to be bound to a `RecyclerView`?
 
