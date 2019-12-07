@@ -12,9 +12,9 @@ import javax.inject.Singleton
  * Base provider/builder for OkHttp Requests, given an url, body and params
  */
 @Singleton
-class OkHttpRequestProvider {
+open class OkHttpRequestProvider {
 
-    internal fun provideRequest(baseUrl: String,
+    internal open fun provideRequest(baseUrl: String,
                                 method: RequestMethod,
                                 body: RequestBody? = null,
                                 vararg params: RequestParam): Request {

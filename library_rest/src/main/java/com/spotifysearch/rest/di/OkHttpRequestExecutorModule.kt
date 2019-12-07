@@ -13,11 +13,11 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
-class OkHttpRequestExecutorModule(val baseHeaders: List<RestHeader>? = null) {
+open class OkHttpRequestExecutorModule(val baseHeaders: List<RestHeader>? = null) {
 
     @Provides
     @Singleton
-    fun provideBaseOkHttpClient(): OkHttpClient {
+   open fun provideBaseClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
                 .connectTimeout(OKHTTP_CLIENT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .readTimeout(OKHTTP_CLIENT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -36,9 +36,9 @@ class OkHttpRequestExecutorModule(val baseHeaders: List<RestHeader>? = null) {
 
     @Provides
     @Singleton
-    fun provideRequestProvider(): OkHttpRequestProvider = OkHttpRequestProvider.instance
+    open  fun provideRequestProvider(): OkHttpRequestProvider = OkHttpRequestProvider.instance
 
     @Provides
     @Singleton
-    fun provideGson(): Gson = Gson()
+    open  fun provideGson(): Gson = Gson()
 }

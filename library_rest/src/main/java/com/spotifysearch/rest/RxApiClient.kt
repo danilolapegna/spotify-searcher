@@ -81,7 +81,7 @@ class RxApiClient private constructor(
         return Single.create { subscriber ->
             val finalUrl = "$baseUrl$additionalUrl"
             try {
-                val result = { executor.executeRestRequest(responseClass, finalUrl, method, body, bodyType, *params) }.invoke()
+                val result = { executor.executeAndParseRestRequest(responseClass, finalUrl, method, body, bodyType, *params) }.invoke()
                 subscriber.onSuccess(result)
             } catch (e: Exception) {
                 subscriber.onError(e)
@@ -91,7 +91,7 @@ class RxApiClient private constructor(
 
     class Builder {
 
-        private var baseUrl: String? = null
+        private var baseUrl: String? = ""
 
         private var baseHeaders: ArrayList<RestHeader>? = null
 

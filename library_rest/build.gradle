@@ -65,5 +65,6 @@ dependencies {
     testApi TestLibs.mockito
     testApi TestLibs.mockito_kotlin
     androidTestApi TestLibs.espresso
+    testApi TestLibs.robolectric
 }
 

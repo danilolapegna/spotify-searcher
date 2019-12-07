@@ -107,6 +107,7 @@ object TestLibs {
     val mockito = "org.mockito:mockito-core:${Version.mockitoVersion}"
     val mockito_kotlin = "com.nhaarman:mockito-kotlin:1.5.0"
     val espresso = "com.android.support.test.espresso:espresso-core:3.0.1"
+    val robolectric = "org.robolectric:robolectric:3.4.2"
 }
 
 object ArchComponents{

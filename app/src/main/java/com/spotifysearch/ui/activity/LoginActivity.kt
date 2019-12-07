@@ -23,7 +23,6 @@ class LoginActivity : DaggerAppCompatActivity() {
         setContentView(R.layout.activity_login)
         if (sharedPreferences.isLoggedIn()) {
             goToSearch()
-            finish()
         } else {
             setupView()
         }

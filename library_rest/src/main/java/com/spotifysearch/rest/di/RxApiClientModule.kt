@@ -9,13 +9,13 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class RxApiClientModule(val baseHeaders: List<RestHeader>?) {
+open class RxApiClientModule(val baseHeaders: List<RestHeader>?) {
 
     @Provides
     @Singleton
-    fun provideGson(): Gson = Gson()
+    open fun provideGson(): Gson = Gson()
 
     @Provides
     @Singleton
-    fun provideExecutor(): BaseRestRequestExecutor = OkHttpRequestExecutor(baseHeaders)
+    open fun provideExecutor(): BaseRestRequestExecutor = OkHttpRequestExecutor(baseHeaders)
 }

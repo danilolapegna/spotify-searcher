@@ -1,6 +1,4 @@
 package com.spotifysearch.rest.client
-
-import android.annotation.SuppressLint
 import android.support.annotation.WorkerThread
 import com.google.gson.Gson
 import com.spotifysearch.rest.BaseRestRequestExecutor
@@ -9,8 +7,7 @@ import com.spotifysearch.rest.di.DaggerOkHttpRequestExecutorComponent
 import com.spotifysearch.rest.di.OkHttpRequestExecutorModule
 import com.spotifysearch.rest.exceptions.HttpException
 import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
+import okhttp3.Response
 import okhttp3.ResponseBody
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,7 +22,7 @@ import javax.inject.Singleton
  * Only invoke from worker thread and, if possible, never directly, but through an ApiClient
  */
 @Singleton
-class OkHttpRequestExecutor(baseHeaders: List<RestHeader>? = null) : BaseRestRequestExecutor {
+open class OkHttpRequestExecutor(baseHeaders: List<RestHeader>? = null) : BaseRestRequestExecutor {
 
     @Inject
     lateinit var okHttpRequestProvider: OkHttpRequestProvider
@@ -45,31 +42,40 @@ class OkHttpRequestExecutor(baseHeaders: List<RestHeader>? = null) : BaseRestReq
                 .inject(this)
     }
 
+    /*
+     * Run to get final, de-serialised response
+     */
     @Throws(HttpException::class)
     @WorkerThread
-    override fun <T> executeRestRequest(responseClass: Class<T>,
-                                        baseUrl: String,
-                                        requestMethod: RequestMethod,
-                                        body: Any?,
-                                        bodyType: BodyType,
-                                        vararg params: RequestParam): T {
-        val okHttpBody = executeRequestInternal(body, bodyType) { requestBody ->
-            okHttpRequestProvider.provideRequest(baseUrl, requestMethod, requestBody, *params)
-        }
-        return gson.fromJson(okHttpBody?.string(), responseClass)
+    override fun <T> executeAndParseRestRequest(responseClass: Class<T>,
+                                                baseUrl: String,
+                                                requestMethod: RequestMethod,
+                                                body: Any?,
+                                                bodyType: BodyType,
+                                                vararg params: RequestParam): T {
+        val okHttpBody = executeOkHttpRequest(baseUrl, requestMethod, body, bodyType, *params)
+        return gson.fromJson(parseBody(okHttpBody)?.string(), responseClass)
     }
 
-    private fun executeRequestInternal(body: Any? = null,
-                                       bodyType: BodyType = BodyType.JSON,
-                                       bodyToRequestCreateAction: (RequestBody?) -> Request): ResponseBody? {
+    /*
+     * Run to get Okhttp request only
+     */
+    fun executeOkHttpRequest(baseUrl: String,
+                             requestMethod: RequestMethod,
+                             body: Any? = null,
+                             bodyType: BodyType = BodyType.JSON,
+                             vararg params: RequestParam): Response {
         val requestBody = if (body != null) {
             bodyType.convert(body, gson)
         } else null
 
-        val request = bodyToRequestCreateAction(requestBody)
-        val response = okHttpClient.newCall(request).execute()
-        if (response.isSuccessful) {
-            return response.body()
+        val request = okHttpRequestProvider.provideRequest(baseUrl, requestMethod, requestBody, *params)
+        return okHttpClient.newCall(request).execute()
+    }
+
+    private fun parseBody(response: Response): ResponseBody? {
+        return if (response.isSuccessful) {
+            response.body()
         } else {
             throw HttpException(response.code(), response.message(), response.body())
         }
@@ -77,8 +83,6 @@ class OkHttpRequestExecutor(baseHeaders: List<RestHeader>? = null) : BaseRestReq
 
     companion object {
 
-        /* Can suppress as it's Application Context */
-        @SuppressLint("StaticFieldLeak")
         val instance = OkHttpRequestExecutor()
     }
 }
