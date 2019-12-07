@@ -35,11 +35,12 @@
                 android:layout_height="wrap_content"
                 android:background="?selectableItemBackgroundBorderless"
                 android:clickable="true"
+                android:layout_marginTop="@dimen/big_margin"
                 android:focusable="true"
                 android:gravity="center"
                 android:text="@string/go_to_artist_page"
                 android:textColor="@color/white"
-                android:textSize="@dimen/text_large"
+                android:textSize="@dimen/text_xlarge"
                 android:textStyle="bold" />
 
         </LinearLayout>

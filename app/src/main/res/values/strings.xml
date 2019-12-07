@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Spotify App</string>
+    <string name="app_name">Spotify Searcher</string>
     <string name="com_spotify_sdk_redirect_scheme">ticketswap-spotify</string>
     <string name="com_spotify_sdk_redirect_host">ticketswap-spotify</string>
     <string name="spotify_campaign_token">your-campaign-token</string>
@@ -25,7 +25,7 @@
     <string name="genre_format">Genre:&#160;</string>
     <string name="list_comma_format">,&#160;</string>
     <string name="genres_unknown">Unknown</string>
-    <string name="go_to_artist_page">Go to artist page</string>
+    <string name="go_to_artist_page">Go to Spotify artist page</string>
     <string name="unavailable_network_error">Unavailable network</string>
     <string name="logout">Logout</string>
     <string name="successful_logout">Logged out successfully</string>
