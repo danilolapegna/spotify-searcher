@@ -34,7 +34,7 @@ abstract class BaseRecyclerViewFragment<T, V : RecyclerBaseViewHolder<T>> : Frag
         swipeRefresh.isEnabled = enableSwipeRefresh()
     }
 
-    open fun enableSwipeRefresh(): Boolean = true
+    open fun enableSwipeRefresh(): Boolean = false
 
     override fun updateElements(elements: List<T>) {
         adapter.updateAdapter(elements)

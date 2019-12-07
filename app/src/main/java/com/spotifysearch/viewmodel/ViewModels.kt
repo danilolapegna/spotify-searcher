@@ -38,7 +38,7 @@ class ArtistViewModel(val id: String, context: Context) : SpotifyApiViewModel<Ar
 
         /* Populate realm from api if object is incomplete/old. RealmResults will be already subscribed to it */
         if (shouldFetchArtistFromApi(artist?.firstOrNull())) {
-            val request = restRxClientBuilder.responseClass(ArtistItem::class.java)
+            val request = requestBuilder.responseClass(ArtistItem::class.java)
                     .pathParameter(application.getString(R.string.path_param_artist), id)
                     .build()
             executeRequest(request, getArtistResponseListener(), application, queueIfNoNetwork = true)
@@ -72,7 +72,7 @@ class TrackViewModel(val id: String, context: Context) : SpotifyApiViewModel<Tra
 
         /* Populate realm from api if object is incomplete/old. RealmResults will be already subscribed to it */
         if (shouldFetchTrackFromApi(track?.firstOrNull())) {
-            val request = restRxClientBuilder.responseClass(TrackItem::class.java)
+            val request = requestBuilder.responseClass(TrackItem::class.java)
                     .pathParameter(application.getString(R.string.path_param_track), id)
                     .build()
                     .subscribeOn(Schedulers.io())
@@ -98,7 +98,7 @@ class TrackViewModel(val id: String, context: Context) : SpotifyApiViewModel<Tra
  */
 class SearchViewModel(context: Context) : SpotifyApiViewModel<SearchResponse>(context) {
 
-    protected var query: String = ""
+    private var query: String = ""
 
     val searchResults: Single<ArrayList<SearchItem>>
         get() = loadSearchResults()
@@ -108,7 +108,7 @@ class SearchViewModel(context: Context) : SpotifyApiViewModel<SearchResponse>(co
     }
 
     private fun loadSearchResults(): Single<ArrayList<SearchItem>> {
-        return restRxClientBuilder
+        return requestBuilder
                 .responseClass(SearchResponse::class.java)
                 .additionalUrl(application.getString(R.string.spotify_path_search))
                 .queryParameter(application.getString(R.string.spotify_query_param_name), query)
@@ -130,19 +130,13 @@ open class SpotifyApiViewModel<T>(context: Context) : ViewModel() {
     /* No risk of leak as it's always appContext and not other context */
     protected val application: Context = context.applicationContext
 
-    protected val restRxClientBuilder: RxApiClientRequestBuilder<T>
+    private val restRxClient = RxApiClient.Builder()
+            .baseUrl(context.getString(R.string.spotify_base_url))
+            .header(ApplicationRestHeadersProvider(context).getAuthHeader())
+            .header(ApplicationRestHeadersProvider(context).getContentTypeHeader())
+            .build()
 
-    init {
-        val headersProvider = ApplicationRestHeadersProvider(context)
-        val restRxClient = RxApiClient.Builder()
-                .baseUrl(context.getString(R.string.spotify_base_url))
-                .header(headersProvider.getAuthHeader())
-                .header(headersProvider.getContentTypeHeader())
-                .build()
-
-        restRxClientBuilder = RxApiClientRequestBuilder<T>()
+    protected val requestBuilder: RxApiClientRequestBuilder<T>
+        get() = RxApiClientRequestBuilder<T>()
                 .client(restRxClient)
-
-    }
-
 }
