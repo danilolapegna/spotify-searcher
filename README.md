@@ -19,16 +19,15 @@ val spotifyClient = RxApiClient.Builder()
                 .build()
 ```
 
-And to get a Rx search request via this client:
+And to get a Rx search request via this client, for example this way:
 
 ```
-RxApiClientRequestBuilder<T>()
+RxApiClientRequestBuilder<SearchResponse>()
                 .client(spotifyClient)
                 .requestMethod(RequestMethod.GET)
                 .responseClass(SearchResponse::class.java)
                 .additionalUrl("search")
                 .queryParameter("query", query)
-                .queryParameter("type","artist,tracks")
                 .build()
 ```
 
