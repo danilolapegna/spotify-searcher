@@ -76,6 +76,8 @@ No `LiveData` was used, as Rx and Realm both already fulfilled the purpose of ge
 
 - Picasso was used as a default image loading library. A placeholder is displayed while loading and kept in case of error.
 
+- App is meant to be used on portrait mode, as that's where it looks best. By the way, for the sake of "proving" that it handles rotation well, rotation isn't locked. In fact all components are lifecycle-aware, caching is done when needed and subscriptions are disposed when needed, likewise.
+
 - [Material search bar](https://github.com/mancj/MaterialSearchBar) was used for the main search screen.
 
 - Proximanova font was added for a more pleasant user experience
