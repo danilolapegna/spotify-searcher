@@ -21,8 +21,11 @@ import com.spotifysearch.util.RealmHelper.shouldFetchTrackFromApi
 import com.spotifysearch.util.RxRequestHelper
 import com.spotifysearch.util.RxRequestHelper.executeRequest
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.realm.RealmResults
+import java.io.Serializable
 
 /*
  * Load from realm
@@ -41,7 +44,7 @@ class ArtistViewModel(val id: String, context: Context) : SpotifyApiViewModel<Ar
             val request = requestBuilder.responseClass(ArtistItem::class.java)
                     .pathParameter(application.getString(R.string.path_param_artist), id)
                     .build()
-            executeRequest(request, getArtistResponseListener(), application, queueIfNoNetwork = true)
+            executeRequest(request, getArtistResponseListener(), application, delayUntilNetworkAvailable = true)
 
         }
         return artist
@@ -50,11 +53,21 @@ class ArtistViewModel(val id: String, context: Context) : SpotifyApiViewModel<Ar
     private fun getArtistResponseListener(): RxRequestHelper.RxRequestListener<ArtistItem> {
         return object : RxRequestHelper.RxRequestListener<ArtistItem>() {
 
+            override fun onRequestStart(d: Disposable) {
+                super.onRequestStart(d)
+                compositeDisposable.add(d)
+            }
+
             override fun onRequestSuccess(response: ArtistItem) {
                 super.onRequestSuccess(response)
                 persistArtist(response)
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        compositeDisposable.dispose()
     }
 }
 
@@ -76,7 +89,7 @@ class TrackViewModel(val id: String, context: Context) : SpotifyApiViewModel<Tra
                     .pathParameter(application.getString(R.string.path_param_track), id)
                     .build()
                     .subscribeOn(Schedulers.io())
-            executeRequest(request, getTrackResponseListener(), application, queueIfNoNetwork = true)
+            executeRequest(request, getTrackResponseListener(), application, delayUntilNetworkAvailable = true)
         }
 
         return track
@@ -85,11 +98,21 @@ class TrackViewModel(val id: String, context: Context) : SpotifyApiViewModel<Tra
     private fun getTrackResponseListener(): RxRequestHelper.RxRequestListener<TrackItem> {
         return object : RxRequestHelper.RxRequestListener<TrackItem>() {
 
+            override fun onRequestStart(d: Disposable) {
+                super.onRequestStart(d)
+                compositeDisposable.add(d)
+            }
+
             override fun onRequestSuccess(response: TrackItem) {
                 super.onRequestSuccess(response)
                 persistTrack(response)
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        compositeDisposable.dispose()
     }
 }
 
@@ -120,8 +143,9 @@ class SearchViewModel(context: Context) : SpotifyApiViewModel<SearchResponse>(co
                     value.tracks?.items?.let { trackItems -> arrayList.addAll(trackItems.map { SearchItem(it) }) }
                     arrayList
                 }
-
     }
+
+    class ViewModelSearchResponse(val query: String, val results: ArrayList<SearchItem>) : Serializable
 }
 
 open class SpotifyApiViewModel<T>(context: Context) : ViewModel() {
@@ -129,6 +153,8 @@ open class SpotifyApiViewModel<T>(context: Context) : ViewModel() {
     @SuppressLint("StaticFieldLeak")
     /* No risk of leak as it's always appContext and not other context */
     protected val application: Context = context.applicationContext
+
+    protected val compositeDisposable = CompositeDisposable()
 
     private val restRxClient = RxApiClient.Builder()
             .baseUrl(context.getString(R.string.spotify_base_url))

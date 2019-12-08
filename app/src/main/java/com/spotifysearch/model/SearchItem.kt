@@ -1,3 +1,5 @@
 package com.spotifysearch.model
 
-class SearchItem(val elem: Any)
+import java.io.Serializable
+
+class SearchItem(val elem: Serializable) : Serializable

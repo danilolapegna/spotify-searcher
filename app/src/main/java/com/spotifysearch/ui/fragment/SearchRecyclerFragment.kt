@@ -8,6 +8,7 @@ import com.spotifysearch.R
 import com.spotifysearch.model.SearchItem
 import com.spotifysearch.rest.model.ArtistItem
 import com.spotifysearch.rest.model.TrackItem
+import com.spotifysearch.ui.SearchFragmentUI
 import com.spotifysearch.ui.adapter.RecyclerAdapter
 import com.spotifysearch.ui.adapter.SearchAdapter
 import com.spotifysearch.ui.adapter.listener.SearchAdapterListener
@@ -15,14 +16,18 @@ import com.spotifysearch.util.IntentsUtil.getViewArtistIntent
 import com.spotifysearch.util.IntentsUtil.getViewTrackIntent
 import com.spotifysearch.util.RealmHelper.persistArtist
 import com.spotifysearch.util.RealmHelper.persistTrack
+import com.spotifysearch.viewmodel.SearchViewModel
 import kotlinx.android.synthetic.main.fragment_recycler.emptyView
 import kotlinx.android.synthetic.main.fragment_recycler.progress
 import kotlinx.android.synthetic.main.fragment_recycler.swipeRefresh
 
 class SearchRecyclerFragment : BaseRecyclerViewFragment<SearchItem, SearchAdapter.SearchViewHolder>(),
-        SearchAdapterListener {
+        SearchAdapterListener,
+        SearchFragmentUI {
 
     override val adapter: RecyclerAdapter<SearchItem, SearchAdapter.SearchViewHolder> = SearchAdapter(this)
+
+    private var searchResponse: SearchViewModel.ViewModelSearchResponse? = null
 
     private var listener: Listener? = null
 
@@ -81,9 +86,16 @@ class SearchRecyclerFragment : BaseRecyclerViewFragment<SearchItem, SearchAdapte
         }
     }
 
+    override fun hasResponseForQuery(query: String): Boolean = searchResponse?.query == query && searchResponse?.results?.isNotEmpty() == true
+
     override fun onRequestStop() {
         swipeRefresh.isRefreshing = false
         progress.visibility = View.GONE
+    }
+
+    override fun setSearchResponse(searchResponse: SearchViewModel.ViewModelSearchResponse) {
+        this.searchResponse = searchResponse
+        adapter.updateAdapter(searchResponse.results)
     }
 
     companion object {

@@ -11,7 +11,7 @@ import com.spotifysearch.R
 import com.spotifysearch.SharedPreferences
 import com.spotifysearch.model.SearchItem
 import com.spotifysearch.rest.exceptions.HttpException
-import com.spotifysearch.ui.UpdateableListUI
+import com.spotifysearch.ui.SearchFragmentUI
 import com.spotifysearch.ui.displayToast
 import com.spotifysearch.ui.fragment.SearchRecyclerFragment
 import com.spotifysearch.ui.getFragmentInContainer
@@ -24,6 +24,7 @@ import com.spotifysearch.util.TypefaceManager
 import com.spotifysearch.viewmodel.SearchViewModel
 import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_search.searchBar
@@ -33,14 +34,14 @@ import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class SearchActivity : DaggerAppCompatActivity(), SearchRecyclerFragment.Listener, MaterialSearchBar.OnSearchActionListener {
+class SearchActivity : DaggerAppCompatActivity(),
+        SearchRecyclerFragment.Listener,
+        MaterialSearchBar.OnSearchActionListener {
 
     override var lastQuery: String = ""
 
     @Inject
     lateinit var searchPublishSubject: PublishSubject<String>
-
-    private lateinit var searchPublishSubjectSubscription: Disposable
 
     @Inject
     lateinit var searchViewModel: SearchViewModel
@@ -48,12 +49,27 @@ class SearchActivity : DaggerAppCompatActivity(), SearchRecyclerFragment.Listene
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
+    private var lastSearchResponse: SearchViewModel.ViewModelSearchResponse? = null
+
+    private val compositeDisposable = CompositeDisposable()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        if (savedInstanceState == null) switchFragment(SearchRecyclerFragment.newInstance(), R.id.fragmentContainer)
         initToolbar()
         initSearchPublishSubject()
+        if (savedInstanceState == null) {
+            switchFragment(SearchRecyclerFragment.newInstance(), R.id.fragmentContainer)
+        } else {
+            if (savedInstanceState.containsKey(EXTRA_LAST_RESPONSE)) {
+                lastSearchResponse = savedInstanceState.getSerializable(EXTRA_LAST_RESPONSE) as? SearchViewModel.ViewModelSearchResponse
+            }
+        }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        lastQuery = searchBar?.text.toString()
     }
 
     private fun initToolbar() {
@@ -78,18 +94,32 @@ class SearchActivity : DaggerAppCompatActivity(), SearchRecyclerFragment.Listene
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if (!searchPublishSubjectSubscription.isDisposed) searchPublishSubjectSubscription.dispose()
-    }
-
     private fun initSearchPublishSubject() {
 
         /* Create an observable debouncing the subject items, in order to avoid doing useless api calls while typing */
         val searchObservable = searchPublishSubject
                 .debounce(SEARCH_DEBOUNCE_MS, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-        searchPublishSubjectSubscription = searchObservable.subscribe { query -> doSearch(query) }
+        compositeDisposable.add(searchObservable.subscribe { query -> shouldDoSearch(query) })
+    }
+
+    override fun onResumeFragments() {
+        super.onResumeFragments()
+        val fragment = getCurrentSearchFragment()
+        fragment?.let {
+            if (!fragment.hasResponseForQuery(lastQuery)) {
+                lastSearchResponse?.let {
+                    if (it.query == lastQuery) {
+                        fragment.setSearchResponse(it)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
     }
 
     private fun getSearchTextWatcher(): TextWatcher {
@@ -104,15 +134,23 @@ class SearchActivity : DaggerAppCompatActivity(), SearchRecyclerFragment.Listene
         }
     }
 
-    private fun doSearch(query: String) {
+    private fun shouldDoSearch(query: String) {
         lastQuery = query
+        searchViewModel.updateQuery(query)
         if (query.isNotEmpty()) {
-            searchViewModel.updateQuery(query)
-            val request = searchViewModel.searchResults
-            executeRequest(request, getRequestListener(query), this, true)
+            val fragment = getCurrentSearchFragment()
+            if (fragment == null || !fragment.hasResponseForQuery(query)) {
+                val request = searchViewModel.searchResults
+                executeRequest(request, getRequestListener(query), this, true)
+            }
         } else {
             getCurrentSearchFragment()?.clearItems()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        lastSearchResponse?.let { outState?.putSerializable(EXTRA_LAST_RESPONSE, it) }
     }
 
     private fun getRequestListener(requestQuery: String): RxRequestHelper.RxRequestListener<ArrayList<SearchItem>> {
@@ -120,7 +158,9 @@ class SearchActivity : DaggerAppCompatActivity(), SearchRecyclerFragment.Listene
 
             override fun onRequestStart(d: Disposable) {
                 runOnUiThread {
-                    getCurrentSearchFragment()?.onRequestStart()
+                    if (NetworkConnectionUtils.isNetworkConnected(this@SearchActivity)) {
+                        getCurrentSearchFragment()?.onRequestStart()
+                    }
                 }
             }
 
@@ -128,9 +168,12 @@ class SearchActivity : DaggerAppCompatActivity(), SearchRecyclerFragment.Listene
                 super.onRequestSuccess(response)
                 runOnUiThread {
                     getCurrentSearchFragment()?.onRequestStop()
+
+                    /* Update only if this is the response associated to last query */
                     if (requestQuery == lastQuery) {
-                        /* Update only if this is the response associated to last query */
-                        getCurrentSearchFragment()?.updateElements(response)
+
+                        lastSearchResponse = SearchViewModel.ViewModelSearchResponse(requestQuery, response)
+                        getCurrentSearchFragment()?.setSearchResponse(lastSearchResponse!!)
                     }
                 }
             }
@@ -164,8 +207,7 @@ class SearchActivity : DaggerAppCompatActivity(), SearchRecyclerFragment.Listene
         hideInputMethod()
     }
 
-    @SuppressWarnings("Unchecked")
-    private fun getCurrentSearchFragment() = getFragmentInContainer() as? UpdateableListUI<SearchItem>
+    private fun getCurrentSearchFragment() = getFragmentInContainer() as? SearchFragmentUI
 
     private fun logout(logoutMessageRes: Int) {
         displayToast(logoutMessageRes)
@@ -177,6 +219,7 @@ class SearchActivity : DaggerAppCompatActivity(), SearchRecyclerFragment.Listene
     companion object {
 
         const val EXTRA_ID = "extra_id"
+        const val EXTRA_LAST_RESPONSE = "extra_last_response"
 
         const val SEARCH_DEBOUNCE_MS = 500L
     }

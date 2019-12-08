@@ -14,38 +14,35 @@ import io.reactivex.schedulers.Schedulers
 
 object RxRequestHelper {
 
-    private var networkSubscription: Disposable? = null
-
-    private var queuedExecuteRequestAction: (() -> Unit)? = null
-
     fun <T> executeRequest(request: Single<T>,
                            requestListener: RxRequestListener<T>,
                            context: Context,
-                           queueIfNoNetwork: Boolean = false) {
+                           delayUntilNetworkAvailable: Boolean = false) {
 
-        val executeRequestAction = {
-            request.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(wrapIntoObserver(requestListener, context))
+        val finalRequest: Single<T>
 
-        }
-        if (queueIfNoNetwork) {
-            subscribeToNetworkEventsIfNot()
-            if (isNetworkConnected(context)) {
-                executeRequestAction.invoke()
-            } else {
-                postOnMainThread { Toast.makeText(context, R.string.will_execute_when_network_is_back, Toast.LENGTH_LONG).show() }
-                queuedExecuteRequestAction = executeRequestAction
-            }
+        if (delayUntilNetworkAvailable && !isNetworkConnected(context)) {
+            postOnMainThread { Toast.makeText(context, R.string.will_execute_when_network_is_back, Toast.LENGTH_LONG).show() }
+            finalRequest = networkStateObservable
+                    .takeUntil { it.isConnected == true }
+                    .singleOrError()
+                    .flatMap { request }
         } else {
-            executeRequestAction.invoke()
+            finalRequest = request
         }
+        executeInternal(finalRequest, requestListener)
     }
 
-    private fun <T> wrapIntoObserver(requestListener: RxRequestListener<T>, context: Context): SingleObserver<T> {
+    private fun <T> executeInternal(request: Single<T>,
+                                    requestListener: RxRequestListener<T>) {
+        request.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(wrapIntoObserver(requestListener))
+    }
+
+    private fun <T> wrapIntoObserver(requestListener: RxRequestListener<T>): SingleObserver<T> {
         return object : SingleObserver<T> {
             override fun onSuccess(t: T) {
-                queuedExecuteRequestAction = null
                 requestListener.onRequestSuccess(t)
             }
 
@@ -54,28 +51,9 @@ object RxRequestHelper {
             }
 
             override fun onError(e: Throwable) {
-                if (isNetworkConnected(context)) {
-
-                    /* Remove from queue only if is not an error-related network */
-                    queuedExecuteRequestAction = null
-                }
                 requestListener.onRequestError(e)
             }
         }
-    }
-
-    private fun subscribeToNetworkEventsIfNot() {
-        if (networkSubscription == null) {
-            networkSubscription = networkStateObservable.subscribe { connectionState ->
-                if (connectionState.isConnected == true) {
-                    executeNextRequestInQueue()
-                }
-            }
-        }
-    }
-
-    private fun executeNextRequestInQueue() {
-        queuedExecuteRequestAction?.invoke()
     }
 
     abstract class RxRequestListener<T> {

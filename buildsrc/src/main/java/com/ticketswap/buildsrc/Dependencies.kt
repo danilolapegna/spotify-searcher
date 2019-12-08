@@ -110,7 +110,7 @@ object TestLibs {
     val robolectric = "org.robolectric:robolectric:3.4.2"
 }
 
-object ArchComponents{
+object ArchComponents {
     val navigationFragment = "android.arch.navigation:navigation-fragment-ktx:${Version.navigationVersion}"
     val navigationUi = "android.arch.navigation:navigation-ui-ktx:${Version.navigationVersion}"
 }
