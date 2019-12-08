@@ -118,7 +118,7 @@ class SearchActivity : DaggerAppCompatActivity(), SearchRecyclerFragment.Listene
     private fun getRequestListener(requestQuery: String): RxRequestHelper.RxRequestListener<ArrayList<SearchItem>> {
         return object : RxRequestHelper.RxRequestListener<ArrayList<SearchItem>>() {
 
-            override fun onRequestStart() {
+            override fun onRequestStart(d: Disposable) {
                 runOnUiThread {
                     getCurrentSearchFragment()?.onRequestStart()
                 }

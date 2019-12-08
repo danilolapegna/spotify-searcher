@@ -1,6 +1,9 @@
 package com.spotifysearch.util
 
 import android.content.Context
+import android.widget.Toast
+import com.spotifysearch.R
+import com.spotifysearch.util.MethodUtils.postOnMainThread
 import com.spotifysearch.util.NetworkConnectionUtils.isNetworkConnected
 import com.spotifysearch.util.RxNetworkStateChangeDispatcher.Companion.networkStateObservable
 import io.reactivex.Single
@@ -31,6 +34,7 @@ object RxRequestHelper {
             if (isNetworkConnected(context)) {
                 executeRequestAction.invoke()
             } else {
+                postOnMainThread { Toast.makeText(context, R.string.will_execute_when_network_is_back, Toast.LENGTH_LONG).show() }
                 queuedExecuteRequestAction = executeRequestAction
             }
         } else {
@@ -46,7 +50,7 @@ object RxRequestHelper {
             }
 
             override fun onSubscribe(d: Disposable) {
-                requestListener.onRequestStart()
+                requestListener.onRequestStart(d)
             }
 
             override fun onError(e: Throwable) {
@@ -78,7 +82,7 @@ object RxRequestHelper {
 
         open fun onRequestError(throwable: Throwable) {}
 
-        open fun onRequestStart() {}
+        open fun onRequestStart(d: Disposable) {}
 
         open fun onRequestSuccess(response: T) {}
     }
