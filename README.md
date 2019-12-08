@@ -92,6 +92,8 @@ This is the list of the "limitations" I'm aware of, and that were kept as such a
 
 - Artist page feels a bit empty. Some more, interesting info could be added? Maybe an albums query to be bound to a `RecyclerView`?
 
+- Migrate from `AppCompat` to `androidx` in order to use components as `LifecycleObserver`
+
 - A side `DrawerLayout` with search filters? (search only artists, search only tracks, sort by...)
 
 - Some pagination, maybe with lazy loading, could be added to the main search in order to add a few more results per string. By the way, as far as I could see, for now, a reasonable set of relevant results is always displayed within the first 20.
