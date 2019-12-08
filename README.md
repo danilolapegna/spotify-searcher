@@ -94,7 +94,7 @@ This is the list of the "limitations" I'm aware of, and that were kept as such a
 
 - Authentication is made without a refresh token, which means it expires usually after 30 minutes of use. We'd need probably to implement a full authentication flow with longer-living token mechanism. By the way doing this without a backend would imply hardcoding a `client_secret` into the mobile app, and that's absolutely unsafe and not recommended. For this reason we'll get to this 30 minutes of usage compromise. Expiration is gracefully handled anyway, and the user is each time prompted to log in again.
 
-- For now my Rx client/library only supports `json` body as a MediaType, so different kind of media (simply by adding more values and converters to the enum), like images or video, can be added in future to the `BodyType` `enum class`.
+- For now my Rx client/library only supports `json` body as a MediaType for requests. This covers all the needed cases at the moment as we don't need to POST/PUT etc. any stream of bytes. But still, different kind of media (simply by adding more values and converters to the enum), like images or video, can be added in future to the `BodyType` `enum class`.
 
 - Artist page feels a bit empty. Some more, interesting info could be added? Maybe an albums query to be bound to a `RecyclerView`?
 
