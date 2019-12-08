@@ -80,7 +80,7 @@ No `LiveData` was used, as Rx and Realm both already fulfilled the purpose of ge
 
 - Proximanova font was added for a more pleasant user experience
 
-- Last api call, wrapped in a closure, is kept on hold in case requested during a moment of no network. The whole app is constantly aware of the current network state through the implementation of a Rx-based `ConnectionStateMonitor` component, and hence the app will be re-executed once the connection is back.
+- Last executed api call is kept on hold in case requested during a moment of no network. The whole app is constantly aware of the current network state through the implementation of a Rx-based `ConnectionStateMonitor` component. This component has its own `Observable<ConnectionState>`, that hence we can `takeFirst -> flatmap` `to our Single<ApiResponse>`. This means that, in case of no network the UI will subscribe not just to the api call, but to a chain "Wait for network to be available -> Take result after then". Important is, if you reuse this functionality, not to show any progress in case the request is on hold, by checking network state again. UI is in fact completely unaware of what's happening "under the hood" and he just knows it subscribed to "something", whether is a network call or a call kept on hold until network is available. And the reason of that is that both things can equally be disposed in lifecycle, when needed.
 
 ## Could-be-added/To-be-improved
 
@@ -95,5 +95,3 @@ This is the list of the "limitations" I'm aware of, and that were kept as such a
 - A side `DrawerLayout` with search filters? (search only artists, search only tracks, sort by...)
 
 - Some pagination, maybe with lazy loading, could be added to the main search in order to add a few more results per string. By the way, as far as I could see, for now, a reasonable set of relevant results is always displayed within the first 20.
-
-- Api call kept on hold when there's no network: probably a larger queue could be implemented + a mechanism to make sure the app isn't re-executed in case it isn't "useful" anymore for the current screen. By the way, even in this case, the compromise serves the purpose.
