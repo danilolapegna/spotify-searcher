@@ -95,6 +95,8 @@ This is the list of the "limitations" I'm aware of, and that were kept as such a
 
 - For now my Rx client/library only supports `json` body as a MediaType for requests. This covers all the needed cases at the moment as we don't need to POST/PUT etc. any stream of bytes. But still, different kind of media (simply by adding more values and converters to the enum), like images or video, can be added in future to the `BodyType` `enum class`.
 
+- For now my Rx client/library assumes `json` is also the format of response content. This can also be expanded (add different converters in order to support XML, etc.)
+
 - Artist page feels a bit empty. Some more, interesting info could be added? Maybe an albums query to be bound to a `RecyclerView`?
 
 - Migrate from `AppCompat` to `androidx` in order to use components as `LifecycleObserver`
